@@ -52,3 +52,15 @@ resource "azurerm_key_vault" "main" {
   soft_delete_retention_days    = 90
   public_network_access_enabled = false
 }
+
+resource "azurerm_storage_account" "reports" {
+  name                            = "streportsdemo"
+  resource_group_name             = azurerm_resource_group.demo.name
+  location                        = azurerm_resource_group.demo.location
+  account_tier                    = "Standard"
+  account_replication_type        = "GRS"
+  min_tls_version                 = "TLS1_2"
+  https_traffic_only_enabled      = true
+  public_network_access_enabled   = false
+  allow_nested_items_to_be_public = false
+}
