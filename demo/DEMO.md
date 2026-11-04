@@ -44,7 +44,9 @@ git commit -am "Serve marketing images from public storage"
 
 5. **Evidence (30s).** Open the run's **Summary → Artifacts → compliance-evidence**. Show `evidence.json`: every decision, the framework mapping, the exception owner and expiry, the commit and run ID, and the SHA-256. Locally, edit a status and run `python evaluate.py --verify evidence.json` to show ❌ TAMPERED.
 
-6. **Close (20s).** "Test once, comply many. Fix it or explain it, and either way the evidence collects itself."
+6. **Into the GRC platform (30s, optional).** Open the latest **grc-sync** run on `main` (Actions tab). Its summary shows exactly what Vanta receives: one record per control and resource, flagged compliant or not, plus the evidence file attached to each control's evidence request. "No one uploads a screenshot to Vanta; the merge does it." (Trigger it beforehand with **Run workflow** if nothing has merged.)
+
+7. **Close (20s).** "Test once, comply many. Fix it or explain it, and either way the evidence collects itself."
 
 ## Offline fallback (no wifi, Actions queue stuck)
 
@@ -56,6 +58,7 @@ cp demo/EXC-001.yaml exceptions/
 demo/run-local.sh              # ACCEPTED
 demo/run-local.sh 2026-12-02   # simulate a date after expiry: EXPIRED
 cat comment.md                 # the PR comment the bot would post
+.venv/bin/python export_vanta.py   # what Vanta would receive
 ```
 
 ## Reset after the demo

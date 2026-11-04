@@ -4,3 +4,5 @@ checkov.json
 comment.md
 evidence.json
 /.pytest_cache/
+vanta-dry-run/
+vanta-summary.md

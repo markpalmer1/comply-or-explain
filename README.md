@@ -34,12 +34,35 @@ Exceptions that no longer match a failing control are flagged as stale so they c
 
 Add an entry to `controls.yaml` mapping Checkov check IDs to the control and its framework references (ISO 27001, SOC 2, NIST CSF). Checkov findings not mapped to a control are ignored.
 
+## Sending evidence to Vanta
+
+`export_vanta.py` turns `evidence.json` into Vanta [Build Integrations API](https://developer.vanta.com/reference/build-integrations/overview) calls for a private integration:
+
+1. **Custom resources** (`PUT /v1/resources/custom_resource`): one record per control and resource, with `status`, `compliant`, frameworks, exception details, commit, run ID and evidence hash. A Vanta custom test that fails when `compliant` is false then drives the mapped Vanta controls continuously.
+2. **Evidence uploads** (`POST /v1/documents/{documentId}/uploads`): `evidence.json` attached to the Vanta document named by `grc.vanta.document_id` in `controls.yaml`.
+
+It refuses to export evidence that fails its hash check.
+
+```bash
+.venv/bin/python export_vanta.py              # dry run: writes the exact requests to vanta-dry-run/
+.venv/bin/python export_vanta.py --send       # real sync (needs the env vars below)
+```
+
+The `grc-sync` workflow runs this on every push to `main` (and on demand). Without Vanta secrets it is a dry run and shows the payload summary on the run page.
+
+**To connect a real Vanta tenant** (not yet tested against one):
+1. Create a private integration in Vanta and a custom resource using `vanta-dry-run/custom-resource-schema.jtd.json` as its schema.
+2. Replace the `example-` document IDs in `controls.yaml` with real Vanta document IDs.
+3. Add repo secrets `VANTA_CLIENT_ID`, `VANTA_CLIENT_SECRET` and `VANTA_RESOURCE_ID`.
+4. Create a Vanta custom test on the resource that fails when `compliant` is false, and map it to your controls.
+
 ## Running locally
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt pytest
 demo/run-local.sh              # scan + evaluate, writes comment.md and evidence.json
 demo/run-local.sh 2026-12-02   # simulate a later date (exception expiry)
+.venv/bin/python export_vanta.py   # preview what Vanta would receive
 .venv/bin/python evaluate.py --verify evidence.json   # detect tampering
 .venv/bin/python -m pytest -q tests
 ```
