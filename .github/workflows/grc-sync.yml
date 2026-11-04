@@ -1,0 +1,53 @@
+name: grc-sync
+
+# Evidence of what actually merged goes to the GRC platform, so this runs on main, not PRs.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  vanta:
+    name: vanta export
+    runs-on: ubuntu-latest
+    env:
+      VANTA_CLIENT_ID: ${{ secrets.VANTA_CLIENT_ID }}
+      VANTA_CLIENT_SECRET: ${{ secrets.VANTA_CLIENT_SECRET }}
+      VANTA_RESOURCE_ID: ${{ secrets.VANTA_RESOURCE_ID }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install tools
+        run: pip install -r requirements.txt
+
+      - name: Scan infrastructure (Checkov)
+        run: checkov -d infra --framework terraform -o json --soft-fail > checkov.json
+
+      - name: Evaluate controls and exceptions
+        # Failing controls are exactly what the GRC platform needs to hear about, so don't stop here
+        run: python evaluate.py || true
+
+      - name: Export to Vanta (dry run unless Vanta secrets are set)
+        run: |
+          if [ -n "$VANTA_CLIENT_ID" ]; then MODE=--send; else MODE=; fi
+          python export_vanta.py $MODE --summary-out vanta-summary.md
+          cat vanta-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload evidence and Vanta payloads
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: grc-sync-${{ github.run_id }}
+          path: |
+            evidence.json
+            vanta-dry-run/
+          if-no-files-found: ignore
+          retention-days: 90
