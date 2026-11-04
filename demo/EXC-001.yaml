@@ -1,0 +1,7 @@
+id: EXC-001
+control: NET-01
+resource: azurerm_storage_account.public_assets
+owner: mark.palmer
+justification: Hosts public marketing images only
+compensating_control: Container restricted to public content; no PII; weekly content review
+expires: 2026-12-01

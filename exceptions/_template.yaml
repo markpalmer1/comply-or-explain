@@ -1,0 +1,9 @@
+# Copy to exceptions/EXC-NNN.yaml, fill in every field, and open a PR.
+# Security team approval is enforced by CODEOWNERS. Max expiry: 90 days.
+id: EXC-NNN
+control: NET-01
+resource: azurerm_storage_account.example
+owner: your.name
+justification: Why this control cannot be met for this resource
+compensating_control: What reduces the risk in the meantime
+expires: 2026-12-31

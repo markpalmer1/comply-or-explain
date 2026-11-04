@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+checkov.json
+comment.md
+evidence.json
+/.pytest_cache/

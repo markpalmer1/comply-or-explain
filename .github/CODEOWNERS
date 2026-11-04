@@ -1,0 +1,4 @@
+# Exceptions and the control library need security team approval.
+# For the hackathon this is a single user; switch to a team (e.g. @org/security-team) for real use.
+/exceptions/    @markpalmer1
+/controls.yaml  @markpalmer1

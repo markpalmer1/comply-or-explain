@@ -1,0 +1,35 @@
+# Control library: maps Checkov check IDs to our controls and framework requirements.
+# Findings for check IDs not listed here are ignored (outside our control library).
+
+- id: NET-01
+  title: Storage accounts must not be publicly accessible
+  checks: [CKV_AZURE_59, CKV_AZURE_190, CKV2_AZURE_47]
+  frameworks:
+    iso27001: [A.8.20]
+    soc2: [CC6.1]
+    nist_csf: [PR.AA-05]
+  fix: Set public_network_access_enabled = false and allow_nested_items_to_be_public = false
+
+- id: NET-02
+  title: Key Vaults must not be publicly accessible
+  checks: [CKV_AZURE_189]
+  frameworks:
+    iso27001: [A.8.20]
+    soc2: [CC6.1]
+  fix: Set public_network_access_enabled = false
+
+- id: CRY-01
+  title: Data in transit encrypted with TLS 1.2+
+  checks: [CKV_AZURE_44, CKV_AZURE_3]
+  frameworks:
+    iso27001: [A.8.24]
+    soc2: [CC6.7]
+  fix: Set min_tls_version = "TLS1_2" and https_traffic_only_enabled = true
+
+- id: RES-01
+  title: Key Vaults must be recoverable
+  checks: [CKV_AZURE_42, CKV_AZURE_110]
+  frameworks:
+    iso27001: [A.8.13]
+    soc2: [A1.2]
+  fix: Set purge_protection_enabled = true
